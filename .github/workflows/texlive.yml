@@ -1,0 +1,145 @@
+# Based on https://github.com/CTeX-org/ctex-kit/blob/master/.github/workflows/test.yml
+
+name: Test in TeX Live
+
+on: [push, pull_request]
+
+env:
+  TLCurrent: https://mirrors.rit.edu/CTAN/systems/texlive/tlnet
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install TeX Live
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        wget ${{env.TLCurrent}}/install-tl-unx.tar.gz
+        tar -xzf install-tl-unx.tar.gz
+        cd install-tl-20*
+        sudo ./install-tl --profile ../.github/workflows/texlive.profile --repository=${{env.TLCurrent}}
+        sudo env "PATH=$PATH" tlmgr install lualibs luatex
+        sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Test texfindpkg query
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        texlua texfindpkg.lua query array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \\fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua query {frame}
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \\foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query {foobar}
+    - name: Test texfindpkg install
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        texlua texfindpkg.lua install array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \\fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua install {frame}
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \\foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install {foobar}
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install TeX Live
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        curl -O ${{env.TLCurrent}}/install-tl-unx.tar.gz
+        tar -xzf install-tl-unx.tar.gz
+        cd install-tl-20*
+        sudo ./install-tl --profile ../.github/workflows/texlive.profile --repository=${{env.TLCurrent}}
+        sudo env "PATH=$PATH" tlmgr install lualibs luatex
+        sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Test texfindpkg query
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        texlua texfindpkg.lua query array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \\fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua query {frame}
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \\foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query {foobar}
+    - name: Test texfindpkg install
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        texlua texfindpkg.lua install array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \\fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua install {frame}
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \\foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install {foobar}
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install TeX Live
+      run: |
+        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        Invoke-WebRequest -Uri ${{env.TLCurrent}}/install-tl.zip -OutFile install-tl.zip
+        Expand-Archive install-tl.zip -DestinationPath .
+        Set-Location install-tl-*
+        .\install-tl-windows --no-gui --profile ..\.github\workflows\texlive.profile --repository=${{env.TLCurrent}}
+        tlmgr install lualibs luatex
+        tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Test texfindpkg query
+      run: |
+        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        texlua texfindpkg.lua query array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua query `{frame`}
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua query \foobar
+        echo --------------------------------
+        texlua texfindpkg.lua query `{foobar`}
+    - name: Test texfindpkg install
+      run: |
+        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        texlua texfindpkg.lua install array.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \fakeverb
+        echo --------------------------------
+        texlua texfindpkg.lua install `{frame`}
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install foobar.sty
+        echo --------------------------------
+        texlua texfindpkg.lua install \foobar
+        echo --------------------------------
+        texlua texfindpkg.lua install `{foobar`}

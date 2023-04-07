@@ -2,11 +2,11 @@
 
 -- Description: Install TeX packages and their dependencies
 -- Copyright: 2023 (c) Jianrui Lyu <tolvjr@163.com>
--- Repository: https://github.com/lvjr/findpkg
+-- Repository: https://github.com/lvjr/texfindpkg
 -- License: GNU General Public License v3.0
 
-local fpversion = "2023C"
-local fpdate = "2023-04-02"
+local tfpversion = "2023D"
+local tfpdate = "2023-04-05"
 
 ------------------------------------------------------------
 --> \section{Some variables and functions}
@@ -23,8 +23,8 @@ require(lookup("lualibs.lua"))
 local json = utilities.json -- for json.tostring and json.tolua
 local gzip = gzip           -- for gzip.compress and gzip.decompress
 
-local function fpPrint(msg)
-  print("[findpkg] " .. msg)
+local function tfpPrint(msg)
+  print("[tfp] " .. msg)
 end
 
 local showdbg = false
@@ -91,18 +91,18 @@ local function tlReadPackageDB()
   if tlroot then
     tlroot = tlroot .. "/tlpkg"
   else
-    fpPrint("error in finding texmf root!")
+    tfpPrint("error in finding texmf root!")
   end
   local list = getFiles(tlroot, "^texlive%.tlpdb%.main")
   if #list > 0 then
     tlpkgtext = fileRead(tlroot .. "/" .. list[1])
     if not tlpkgtext then
-      fpPrint("error in reading texlive package database!")
+      tfpPrint("error in reading texlive package database!")
     end
   else
     -- no texlive.tlpdb.main file in a fresh TeX live
-    fpPrint("error in finding texlive package database!")
-    fpPrint("please run 'tlmgr update --self' first.")
+    tfpPrint("error in finding texlive package database!")
+    tfpPrint("please run 'tlmgr update --self' first.")
   end
 end
 
@@ -140,11 +140,11 @@ local function mtReadPackageDB()
   if mtvar then
     mtpdb = mtvar .. "/miktex/cache/packages/miktex-zzdb3-2.9/package-manifests.ini"
   else
-    fpPrint("error in finding texmf root!")
+    tfpPrint("error in finding texmf root!")
   end
   mtpkgtext = fileRead(mtpdb)
   if not mtpkgtext then
-    fpPrint("error in reading miktex package database!")
+    tfpPrint("error in reading miktex package database!")
   end
 end
 
@@ -182,13 +182,13 @@ local function compareDistributions()
   if tlpkgtext then
     tlParsePackageDB()
   else
-    fpPrint("error in reading texlive package database!")
+    tfpPrint("error in reading texlive package database!")
   end
   mtpkgtext = fileRead(mtpkgname)
   if mtpkgtext then
     mtParsePackageDB()
   else
-    fpPrint("error in reading miktex package database!")
+    tfpPrint("error in reading miktex package database!")
   end
   local tlmissing, mkmissing = {}, {}
   for k, vt in pairs(tlpkgdata) do
@@ -253,7 +253,7 @@ local function extractFileData(cwl)
 end
 
 local function writeJson(cwldata)
-  fpPrint("writing json database to file...")
+  tfpPrint("writing json database to file...")
   local tbl1 = {}
   for k, v in pairs(cwldata) do
     table.insert(tbl1, {k, v})
@@ -267,8 +267,8 @@ local function writeJson(cwldata)
     table.insert(tbl2, item)
   end
   local text = "{\n" .. table.concat(tbl2, "\n,\n") .. "\n}"
-  fileWrite(text, "findpkg.json")
-  fileWrite(gzip.compress(text), "findpkg.json.gz")
+  fileWrite(text, "texfindpkg.json")
+  fileWrite(gzip.compress(text), "texfindpkg.json.gz")
 end
 
 local cwlpath = "completion"
@@ -293,7 +293,7 @@ local function generateJsonData()
       dbgPrint(item)
       cwldata[fname] = item
     else
-      fpPrint("error in reading " .. v)
+      tfpPrint("error in reading " .. v)
     end
   end
   writeJson(cwldata)
@@ -307,7 +307,7 @@ local dist -- name of current tex distribution
 
 local function initPackageDB()
   dist = testDistribution()
-  fpPrint("you are using " .. dist)
+  tfpPrint("you are using " .. dist)
   if dist == "texlive" then
     tlReadPackageDB()
     tlParsePackageDB()
@@ -325,36 +325,62 @@ local function findOnePackage(fname)
   end
 end
 
+local function tfpExecute(c)
+  if os.type == "windows" then
+    os.execute(c)
+  else
+    os.execute('sudo env "PATH=$PATH" ' .. c)
+  end
+end
+
 local function installSomePackages(list)
+  if not list then return end
   if dist == "texlive" then
     local p = table.concat(list, " ")
-    fpPrint("installing package " .. p)
-    os.execute("tlmgr install " .. p)
+    tfpPrint("installing package " .. p)
+    tfpExecute("tlmgr install " .. p)
   else
     for _, p in ipairs(list) do
-      fpPrint("installing package " .. p)
-      os.execute("miktex packages install " .. p)
+      tfpPrint("installing package " .. p)
+      tfpExecute("miktex packages install " .. p)
     end
   end
+end
+
+local function listSomePackages(list)
+  if not list then return end
+  local p = table.concat(list, " ")
+  tfpPrint("please install " .. dist .. " package " .. p)
 end
 
 ------------------------------------------------------------
 --> \section{Find dependencies of package files}
 ------------------------------------------------------------
 
-local fptext = ""  -- the json text
-local fpdata = {}  -- the lua object
+local tfptext = ""  -- the json text
+local tfpdata = {}  -- the lua object
 local fnlist = {}  -- file name list
+
+local function initDependencyDB()
+  local ziptext = fileRead(lookup("texfindpkg.json.gz"))
+  tfptext = gzip.decompress(ziptext)
+  if tfptext then
+    --print(tfptext)
+    tfpdata = json.tolua(tfptext)
+  else
+    tfpPrint("error in reading texfindpkg.json.gz!")
+  end
+end
 
 local function findDependencies(fname)
   --print(fname)
   if valueExists(fnlist, fname) then return end
-  local item = fpdata[fname]
+  local item = tfpdata[fname]
   if not item then
-    fpPrint("could not find package file " .. fname)
+    tfpPrint("no dependency info for " .. fname)
     return
   end
-  fpPrint("finding dependencies for " .. fname)
+  tfpPrint("finding dependencies for " .. fname)
   table.insert(fnlist, fname)
   local deps = item.deps
   if deps then
@@ -364,11 +390,11 @@ local function findDependencies(fname)
   end
 end
 
-local function installByFileName(fname)
+local function queryByFileName(fname)
   fnlist = {} -- reset the list
   findDependencies(fname)
   if #fnlist == 0 then
-    fpPrint("error in finding package file")
+    tfpPrint("could not find any package with file " .. fname)
     return
   end
   local pkglist = {}
@@ -380,85 +406,116 @@ local function installByFileName(fname)
     end
   end
   if not pkglist then
-    fpPrint("error in finding package in " .. dist)
+    tfpPrint("error in finding package in " .. dist)
     return
   end
-  installSomePackages(pkglist)
+  return pkglist
 end
 
 local function getFileNameFromCmdEnvName(cmdenv, name)
   --print(name)
-  for line in fptext:gmatch("(.-)\n[,}]") do
+  for line in tfptext:gmatch("(.-)\n[,}]") do
     if line:find('"' .. name .. '"') then
       --print(line)
       local fname, fspec = line:match('"(.-)":(.+)')
       --print(fname, fspec)
       local item = json.tolua(fspec)
       if valueExists(item[cmdenv], name) then
-        fpPrint("found package file " .. fname)
+        tfpPrint("found package file " .. fname)
         return fname
       end
     end
   end
-  fpPrint("could not find any package file with " .. name)
 end
 
-local function installByCommandName(cname)
+local function queryByCommandName(cname)
   --print(cname)
   local fname = getFileNameFromCmdEnvName("cmds", cname)
   if fname then
-    installByFileName(fname)
+    return queryByFileName(fname)
+  else
+    tfpPrint("could not find any package with command \\" .. cname)
   end
 end
 
-local function installByEnvironmentName(ename)
+local function queryByEnvironmentName(ename)
   --print(ename)
   local fname = getFileNameFromCmdEnvName("envs", ename)
   if fname then
-    installByFileName(fname)
+    return queryByFileName(fname)
+  else
+    tfpPrint("could not find any package with environment {" .. ename .. "}")
+  end
+end
+
+local function query(name)
+  local h = name:sub(1,1)
+  if h == "\\" then
+    local b = name:sub(2)
+    return queryByCommandName(b)
+  elseif h == "{" then
+    if name:sub(-1) == "}" then
+      local b = name:sub(2,-2)
+      return queryByEnvironmentName(b)
+    else
+      tfpPrint("invalid input " .. name)
+    end
+  else
+    return queryByFileName(name)
   end
 end
 
 local function install(name)
-  local h = name:sub(1,1)
-  if h == "\\" then
-    local b = name:sub(2)
-    installByCommandName(b)
-  elseif h == "{" then
-    if name:sub(-1) == "}" then
-      local b = name:sub(2,-2)
-      installByEnvironmentName(b)
-    else
-      fpPrint("invalid input " .. name)
-    end
-  else
-    installByFileName(name)
-  end
+  local list = query(name)
+  installSomePackages(list)
 end
 
 ------------------------------------------------------------
 --> \section{Respond to user input}
 ------------------------------------------------------------
 
+local helptext = [[
+usage: texfindpkg <action> [<options>] [<name>]
+
+Valid actions are:
+   install      Install some package and its dependencies
+   query        Query dependencies for some package
+
+Valid options are:
+   --help       Print this message and exit
+   --version    Print version information and exit
+]]
+
 local function main()
-  if arg[1] == nil then return end
-  initPackageDB()
-  if arg[1] == "install" then
-    local ziptext = fileRead(lookup("findpkg.json.gz"))
-    fptext = gzip.decompress(ziptext)
-    if fptext then
-      --print(fptext)
-      fpdata = json.tolua(fptext)
+  if arg[1] == nil then
+    print(helptext)
+  elseif arg[1] == "--help" then
+    print(helptext)
+  elseif arg[1] == "--version" then
+    print("TeXFindPkg Version " .. tfpversion .. " (" .. tfpdate .. ")\n")
+  elseif arg[1] == "install" then
+    if arg[2] then
+      initPackageDB()
+      initDependencyDB()
       install(arg[2])
     else
-      fpPrint("error in reading findpkg.json!")
+      tfpPrint("missing the name of file/cmd/env!")
+    end
+  elseif arg[1] == "query" then
+    if arg[2] then
+      initPackageDB()
+      initDependencyDB()
+      local list = query(arg[2])
+      listSomePackages(list)
+    else
+      tfpPrint("missing the name of file/cmd/env!")
     end
   elseif arg[1] == "generate" then
     generateJsonData()
   elseif arg[1] == "compare" then
     compareDistributions()
   else
-    fpPrint("unknown option " .. arg[1])
+    tfpPrint("unknown option " .. arg[1])
   end
 end
 
