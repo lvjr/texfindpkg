@@ -21,6 +21,10 @@ jobs:
         sudo ./install-tl --profile ../.github/workflows/texlive.profile --repository=${{env.TLCurrent}}
         sudo env "PATH=$PATH" tlmgr install lualibs luatex
         sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Run tfpbuild
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
         export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
@@ -53,6 +57,19 @@ jobs:
         texlua texfindpkg.lua install \\foobar
         echo --------------------------------
         texlua texfindpkg.lua install {foobar}
+    - name: Test man page
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        man -l texfindpkg.1
+        sudo apt-get update
+        sudo apt-get install ghostscript
+        groff -man -t -rS11 texfindpkg.1 | ps2pdf -sPAPERSIZE=a4 - texfindpkg.man1.pdf
+    - name: Upload pdf file
+      uses: actions/upload-artifact@v3
+      with:
+        name: texfindpkg-manpage
+        path: |
+          *.pdf
   build-macos:
     runs-on: macos-latest
     steps:
@@ -66,6 +83,10 @@ jobs:
         sudo ./install-tl --profile ../.github/workflows/texlive.profile --repository=${{env.TLCurrent}}
         sudo env "PATH=$PATH" tlmgr install lualibs luatex
         sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Run tfpbuild
+      run: |
+        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
         export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
@@ -111,6 +132,10 @@ jobs:
         .\install-tl-windows --no-gui --profile ..\.github\workflows\texlive.profile --repository=${{env.TLCurrent}}
         tlmgr install lualibs luatex
         tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
+    - name: Run tfpbuild
+      run: |
+        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
         ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}

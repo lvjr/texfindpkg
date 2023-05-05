@@ -1,26 +1,29 @@
-.TH texfindpkg 1 "2023-04-05" "2023D"
+.TH texfindpkg 1 "2023-05-05" "2023E"
 .SH NAME
-TexFindPkg \- Install TeX packages and their dependencies
+TexFindPkg \- Query or install TeX packages and their dependencies
 .SH SYNOPSIS
-texfindpkg <action> [<options>] [<name>]
+texfindpkg <action> [<option>] [<name>]
 .SH DESCRIPTION
-TeXFindPkg makes it easy to install TeX packages and their dependencies
-by file names, command names or environment names.
+TeXFindPkg tool makes it easy to query or install some TeX packages and
+their dependencies by file names, command names or environment names.
 .PP
 The most commonly used TeXFindPkg actions are:
-.IP install
-Install some package and its dependencies
-.IP query
+.IP "query, \-\-query" 6
 Query dependencies for some package
+.IP "install, \-\-install" 6
+Install some package and its dependencies
+.IP "help, \-\-help" 6
+Print a help message and exit
+.IP "version, \-\-version" 6
+Print version information and exit
 .SH OPTIONS
 Various options apply
-.IP --help
-Print a help message and exit
-.IP --version
-Print version information and exit
+.IP -f 6
+Query or install packages by file name
+.IP -c 6
+Query or install packages by command name
+.IP -e 6
+Query or install packages by environment name
 .SH BUGS
-.SH AUTHOR
-Jianrui Lyu <tolvjr@163.com>
-.PP
-Please log issues on the GitHub homepage:
-https://github.com/lvjr/texfindpkg/issues.
+Please log issues on
+https://github.com/lvjr/texfindpkg/issues

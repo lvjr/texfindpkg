@@ -1,0 +1,76 @@
+<<<<<<<<
+texfindpkg install array.sty
+--------
+[tfp] you are using texlive
+[tfp] ================================================
+[tfp] building dependency tree for array.sty:
+[tfp] ------------------------
+[tfp] array.sty (from tools)
+[tfp] ------------------------
+[tfp] texlive package needed: tools
+>>>>>>>>
+<<<<<<<<
+texfindpkg install \fakeverb
+--------
+[tfp] you are using texlive
+[tfp] ================================================
+[tfp] found package file codehigh.sty with command \fakeverb
+[tfp] building dependency tree for codehigh.sty:
+[tfp] ------------------------
+[tfp] codehigh.sty (from codehigh)
+[tfp] |- expl3.sty (from l3kernel)
+[tfp] |- catchfile.sty (from catchfile)
+[tfp]    |- infwarerr.sty (from infwarerr)
+[tfp]    |- ltxcmds.sty (from ltxcmds)
+[tfp]    |- etexcmds.sty (from etexcmds)
+[tfp] |- xcolor.sty (from xcolor)
+[tfp]    |- color.sty (from graphics)
+[tfp]    |- colortbl.sty (from colortbl)
+[tfp]       |- array.sty (from tools)
+[tfp]    |- pdfcolmk.sty (from pdfcolmk)
+[tfp] |- ninecolors.sty (from ninecolors)
+[tfp] |- varwidth.sty (from varwidth)
+[tfp] |- iftex.sty (from iftex)
+[tfp] ------------------------
+[tfp] texlive packages needed: codehigh l3kernel catchfile infwarerr ltxcmds etexcmds xcolor graphics colortbl tools pdfcolmk ninecolors varwidth iftex
+>>>>>>>>
+<<<<<<<<
+texfindpkg install {frame}
+--------
+[tfp] you are using texlive
+[tfp] ================================================
+[tfp] found package file beamerbaseframe.sty with environment {frame}
+[tfp] building dependency tree for beamerbaseframe.sty:
+[tfp] ------------------------
+[tfp] beamerbaseframe.sty (from beamer)
+[tfp] ------------------------
+[tfp] texlive package needed: beamer
+>>>>>>>>
+<<<<<<<<
+texfindpkg install foobar
+--------
+[tfp] you are using texlive
+>>>>>>>>
+<<<<<<<<
+texfindpkg install foobar.sty
+--------
+[tfp] you are using texlive
+[tfp] ================================================
+[tfp] building dependency tree for foobar.sty:
+[tfp] ------------------------
+[tfp] foobar.sty (not found)
+[tfp] ------------------------
+[tfp] could not find any package with file foobar.sty
+>>>>>>>>
+<<<<<<<<
+texfindpkg install \foobar
+--------
+[tfp] you are using texlive
+[tfp] could not find any package with command \foobar
+>>>>>>>>
+<<<<<<<<
+texfindpkg install {foobar}
+--------
+[tfp] you are using texlive
+[tfp] could not find any package with environment {foobar}
+>>>>>>>>

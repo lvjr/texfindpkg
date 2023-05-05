@@ -1,0 +1,26 @@
+
+name: Download cwl files on Linux
+
+on:
+  workflow_dispatch: # for manual running
+  schedule:
+    # every 02:01 on Friday
+    - cron: '1 2 * * 5'
+
+jobs:
+  download-cwls:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout current repository
+      uses: actions/checkout@v3
+    - name: Checkout TeXstudio repository
+      uses: actions/checkout@v3
+      with:
+        repository: texstudio-org/texstudio
+        path: texstudio
+    - name: Upload cwl files
+      uses: actions/upload-artifact@v3
+      with:
+        name: texstudio-completion
+        path: |
+          texstudio/completion/*.cwl
