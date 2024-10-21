@@ -2,7 +2,7 @@
 
 ```
 Description: Query or Install TeX packages and their dependencies
-Copyright: 2023 (c) Jianrui Lyu <tolvjr@163.com>
+Copyright: 2023-2024 (c) Jianrui Lyu <tolvjr@163.com>
 Repository: https://github.com/lvjr/texfindpkg
 License: GNU General Public License v3.0
 ```
@@ -23,7 +23,7 @@ If a manual installation is needed, you could copy TeXFindPkg files to TEXMF tre
 | texfindpkg.1       | TEXMF/doc/man/man1/texfindpkg.1 |
 | README.md          | TEXMF/doc/support/texfindpkg/README.md |
 | texfindpkg.lua     | TEXMF/scripts/texfindpkg/texfindpkg.lua |
-| texfindpkg.json.gz | TEXMF/scripts/texfindpkg/texfindpkg.json.gz |
+| texfindpkg.json.gz | TEXMF/tex/latex/texfindpkg/texfindpkg.json.gz |
 | tfpbuild.lua       | TEXMF/source/texfindpkg/tfpbuild.lua |
 
 Then you could create a symbolic link from `/usr/local/bin/texfindpkg` to `path/to/texfindpkg.lua` on Linux or MacOS,
