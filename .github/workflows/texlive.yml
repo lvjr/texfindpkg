@@ -6,6 +6,7 @@ on: [push, pull_request]
 
 env:
   TLCurrent: https://mirrors.rit.edu/CTAN/systems/texlive/tlnet
+  TLRelease: 2024
 
 jobs:
   build-ubuntu:
@@ -14,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install TeX Live
       run: |
-        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/x86_64-linux:$PATH
         wget ${{env.TLCurrent}}/install-tl-unx.tar.gz
         tar -xzf install-tl-unx.tar.gz
         cd install-tl-20*
@@ -23,11 +24,11 @@ jobs:
         sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
     - name: Run tfpbuild
       run: |
-        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/x86_64-linux:$PATH
         texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
-        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/x86_64-linux:$PATH
         texlua texfindpkg.lua query array.sty
         echo --------------------------------
         texlua texfindpkg.lua query \\fakeverb
@@ -43,7 +44,7 @@ jobs:
         texlua texfindpkg.lua query {foobar}
     - name: Test texfindpkg install
       run: |
-        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/x86_64-linux:$PATH
         texlua texfindpkg.lua install array.sty
         echo --------------------------------
         texlua texfindpkg.lua install \\fakeverb
@@ -59,7 +60,7 @@ jobs:
         texlua texfindpkg.lua install {foobar}
     - name: Test man page
       run: |
-        export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/x86_64-linux:$PATH
         man -l texfindpkg.1
         sudo apt-get update
         sudo apt-get install ghostscript
@@ -76,7 +77,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install TeX Live
       run: |
-        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/universal-darwin:$PATH
         curl -O ${{env.TLCurrent}}/install-tl-unx.tar.gz
         tar -xzf install-tl-unx.tar.gz
         cd install-tl-20*
@@ -85,11 +86,11 @@ jobs:
         sudo env "PATH=$PATH" tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
     - name: Run tfpbuild
       run: |
-        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/universal-darwin:$PATH
         texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
-        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/universal-darwin:$PATH
         texlua texfindpkg.lua query array.sty
         echo --------------------------------
         texlua texfindpkg.lua query \\fakeverb
@@ -105,7 +106,7 @@ jobs:
         texlua texfindpkg.lua query {foobar}
     - name: Test texfindpkg install
       run: |
-        export PATH=/usr/local/texlive/2023/bin/universal-darwin:$PATH
+        export PATH=/usr/local/texlive/${{env.TLRelease}}/bin/universal-darwin:$PATH
         texlua texfindpkg.lua install array.sty
         echo --------------------------------
         texlua texfindpkg.lua install \\fakeverb
@@ -125,7 +126,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install TeX Live
       run: |
-        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        ${env:PATH} = "C:\texlive\${{env.TLRelease}}\bin\windows;" + ${env:PATH}
         Invoke-WebRequest -Uri ${{env.TLCurrent}}/install-tl.zip -OutFile install-tl.zip
         Expand-Archive install-tl.zip -DestinationPath .
         Set-Location install-tl-*
@@ -134,11 +135,11 @@ jobs:
         tlmgr update --self --all --no-auto-install --repository=${{env.TLCurrent}}
     - name: Run tfpbuild
       run: |
-        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        ${env:PATH} = "C:\texlive\${{env.TLRelease}}\bin\windows;" + ${env:PATH}
         texlua tfpbuild.lua check
     - name: Test texfindpkg query
       run: |
-        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        ${env:PATH} = "C:\texlive\${{env.TLRelease}}\bin\windows;" + ${env:PATH}
         texlua texfindpkg.lua query array.sty
         echo --------------------------------
         texlua texfindpkg.lua query \fakeverb
@@ -154,7 +155,7 @@ jobs:
         texlua texfindpkg.lua query `{foobar`}
     - name: Test texfindpkg install
       run: |
-        ${env:PATH} = "C:\texlive\2023\bin\windows;" + ${env:PATH}
+        ${env:PATH} = "C:\texlive\${{env.TLRelease}}\bin\windows;" + ${env:PATH}
         texlua texfindpkg.lua install array.sty
         echo --------------------------------
         texlua texfindpkg.lua install \fakeverb
