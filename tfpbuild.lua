@@ -104,7 +104,34 @@ end
 
 local cwldata = {}
 
+-- Ignore lines after "# from xxx option of somepkg", see #7
+local function ignoreCmdsFromOptions(cwl)
+  local result = ""
+  local isignored = false
+  for line in gmatch(cwl .. "\n\n", "([^\r\n]-)\r?\n") do
+    if not isignored then
+      if match(line, "# from [^ ]+ option of [^ ]+") then
+        isignored = true
+        --print("start ignoring: " .. line)
+      else
+        result = result .. line .. "\n"
+      end
+    else
+      if match(line, "^ -$") or match(line, "^#endif$") then
+        isignored = false
+        --print("stop ignoring: " .. line)
+      end
+    end
+  end
+  if isignored then
+    dbgPrint("missing stop point!")
+  end
+  --print(result)
+  return result
+end
+
 local function extractFileData(cwl)
+  cwl = ignoreCmdsFromOptions(cwl)
   -- the cwl files have different eol characters
   local deps = {}
   for base in gmatch(cwl, "\n#include:(.-)[\r\n]") do
