@@ -325,6 +325,7 @@ local function listSomePackages(list)
   if #list > 0 then
     filecount = filecount + 1
   end
+  table.sort(list)
   local pkgs = concat(list, " ")
   if #list == 1 then
     tfpPrint(dist .. " package needed: " .. pkgs)
@@ -344,6 +345,7 @@ local function listSomePackages(list)
       tfpRealPrint("these packages are already installed")
     end
   else
+    table.sort(inslist)
     local pkgs = concat(inslist, " ")
     if #inslist == 1 then
       tfpRealPrint(dist .. " package not yet installed: " .. pkgs)
@@ -518,6 +520,7 @@ local function query(namelist)
   end
   if filecount > 1 then
     tfpRealPrint(rep("=", 48))
+    table.sort(totaldeplist)
     local pkgs = concat(totaldeplist, " ")
     if #totaldeplist == 0 then
       --tfpRealPrint("no packages needed are found")
@@ -527,6 +530,7 @@ local function query(namelist)
       tfpRealPrint(dist .. " packages needed in total: " .. pkgs)
     end
     tfpRealPrint(rep("=", 48))
+    table.sort(totalinslist)
     local pkgs = concat(totalinslist, " ")
     if #totalinslist == 0 then
       tfpRealPrint("you don't need to install any packages")
