@@ -477,7 +477,9 @@ local function query(namelist)
   if filecount > 1 then
     tfpRealPrint(rep("=", 48))
     local pkgs = concat(totalinslist, " ")
-    if #totalinslist == 1 then
+    if #totalinslist == 0 then
+      tfpRealPrint("you don't need to install any packages")
+    elseif #totalinslist == 1 then
       tfpRealPrint(dist .. " package not yet installed in total: " .. pkgs)
     else
       tfpRealPrint(dist .. " packages not yet installed in total: " .. pkgs)
