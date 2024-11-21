@@ -430,6 +430,10 @@ end
 
 local function queryByPackageName(pname)
   local list = findFilesInPackage(pname)
+  if list == nil then
+    tfpPrint(dist .. " package " .. pname .. " doesn't exist")
+    return
+  end
   if #list > 0 then
     tfpPrint("finding package files in " .. dist .. " package " .. pname)
     for _, fname in ipairs(list) do
