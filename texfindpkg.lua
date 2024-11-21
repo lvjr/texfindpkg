@@ -413,6 +413,9 @@ end
 
 local function queryByFileName(fname)
   fnlist, pkglist = {}, {} -- reset the list
+  if not find(fname, "%.") then
+    fname = fname .. ".sty"
+  end
   tfpPrint("building dependency tree for " .. fname .. ":")
   tfpPrint(rep("-", 24))
   findDependencies(fname, 0)
