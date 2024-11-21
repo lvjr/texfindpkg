@@ -240,6 +240,7 @@ end
 ------------------------------------------------------------
 
 local dist               -- name of current tex distribution
+local totaldeplist = {}  -- list of all depending packages
 local totalinslist = {}  -- list of all missing packages
 local filecount = 0      -- total number of files found
 
@@ -381,6 +382,9 @@ local function printDependency(fname, level)
     if not valueExists(pkglist, pkg) then
       insert(pkglist, pkg)
     end
+    if not valueExists(totaldeplist, pkg) then
+      insert(totaldeplist, pkg)
+    end
   else
     msg = msg .. " (not found)"
   end
@@ -513,6 +517,15 @@ local function query(namelist)
     queryOne(v[1], v[2])
   end
   if filecount > 1 then
+    tfpRealPrint(rep("=", 48))
+    local pkgs = concat(totaldeplist, " ")
+    if #totaldeplist == 0 then
+      --tfpRealPrint("no packages needed are found")
+    elseif #totaldeplist == 1 then
+      tfpRealPrint(dist .. " package needed in total: " .. pkgs)
+    else
+      tfpRealPrint(dist .. " packages needed in total: " .. pkgs)
+    end
     tfpRealPrint(rep("=", 48))
     local pkgs = concat(totalinslist, " ")
     if #totalinslist == 0 then
