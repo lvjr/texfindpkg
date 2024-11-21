@@ -135,7 +135,8 @@ local function tlReadPackageDB()
   end
 end
 
-local tlpkgdata = {}
+local tlfiletopkg = {}
+local tlpkgtofile = {}
 local tlinspkgdata = {}
 
 local function tlExtractFiles(name, desc)
@@ -147,12 +148,15 @@ local function tlExtractFiles(name, desc)
   end
   -- ignore package files in doc folder
   desc = match(desc, "\nrunfiles .+") or ""
+  local flist = {}
   for base, ext in gmatch(desc, "/([%a%d%-%.]+)%.([%a%d]+)\n") do
     if ext == "sty" or ext == "cls" or ext == "tex" or ext == "ltx" then
       dbgPrint(name, base .. "." .. ext)
-      tlpkgdata[base .. "." .. ext] = name
+      tlfiletopkg[base .. "." .. ext] = name
+      insert(flist, base .. "." .. ext)
     end
   end
+  tlpkgtofile[name]= flist
 end
 
 local function tlExtractPackages(name, desc)
@@ -161,7 +165,7 @@ end
 
 local function tlParsePackageDB(tlpkgtext)
   gsub(tlpkgtext, "name (.-)\n(.-)\n\n", tlExtractFiles)
-  return tlpkgdata
+  return tlfiletopkg
 end
 
 local function tlParseTwoPackageDB()
@@ -193,7 +197,8 @@ local function mtReadPackageDB()
   end
 end
 
-local mtpkgdata = {}
+local mtfiletopkg = {}
+local mtpkgtofile = {}
 local mtinspkgdata = {}
 
 local function mtExtractFiles(name, desc)
@@ -203,12 +208,15 @@ local function mtExtractFiles(name, desc)
     --print(name)
     return
   end
+  local flist = {}
   for base, ext in gmatch(desc, "/([%a%d%-%.]+)%.([%a%d]+)\r?\n") do
     if ext == "sty" or ext == "cls" or ext == "tex" or ext == "ltx" then
       dbgPrint(name, base .. "." .. ext)
-      mtpkgdata[base .. "." .. ext] = name
+      mtfiletopkg[base .. "." .. ext] = name
+      insert(flist, base .. "." .. ext)
     end
   end
+  mtpkgtofile[name]= flist
 end
 
 local function mtExtractPackages(name, desc)
@@ -218,7 +226,7 @@ end
 local function mtParsePackageDB(mtpkgtext)
   -- package-manifests.ini might use different eol characters
   gsub(mtpkgtext, "%[(.-)%]\r?\n(.-)\r?\n\r?\n", mtExtractFiles)
-  return mtpkgdata
+  return mtfiletopkg
 end
 
 local function mtParseTwoPackageDB()
@@ -247,11 +255,19 @@ local function initPackageDB()
   end
 end
 
-local function findOnePackage(fname)
+local function findPackageFromFile(fname)
   if dist == "texlive" then
-    return tlpkgdata[fname]
+    return tlfiletopkg[fname]
   else
-    return mtpkgdata[fname]
+    return mtfiletopkg[fname]
+  end
+end
+
+local function findFilesInPackage(pkg)
+  if dist == "texlive" then
+    return tlpkgtofile[pkg]
+  else
+    return mtpkgtofile[pkg]
   end
 end
 
@@ -359,7 +375,7 @@ end
 
 local function printDependency(fname, level)
   local msg = fname
-  local pkg = findOnePackage(fname)
+  local pkg = findPackageFromFile(fname)
   if pkg then
     msg = msg .. " (from " .. pkg .. ")"
     if not valueExists(pkglist, pkg) then
@@ -410,6 +426,20 @@ local function queryByFileName(fname)
     return
   end
   listSomePackages(pkglist)
+end
+
+local function queryByPackageName(pname)
+  local list = findFilesInPackage(pname)
+  if #list > 0 then
+    tfpPrint("finding package files in " .. dist .. " package " .. pname)
+    for _, fname in ipairs(list) do
+      tfpPrint(rep("=", 48))
+      tfpPrint("found package file " .. fname .. " in " .. dist .. " package " .. pname)
+      queryByFileName(fname)
+    end
+  else
+    tfpPrint("could not find any package file in " .. dist .. " package " .. pname)
+  end
 end
 
 local function getFileNameFromCmdEnvName(cmdenv, name)
@@ -465,8 +495,9 @@ local function queryOne(t, name)
   elseif t == "file" then
     tfpPrint(rep("=", 48))
     queryByFileName(name)
-  else
-    -- do something for t == "pkg"
+  else -- t == "pkg"
+    tfpPrint(rep("=", 48))
+    queryByPackageName(name)
   end
 end
 
@@ -521,12 +552,14 @@ local function parseArgList(arglist)
   local namelist = {}
   local nametype = nil
   for _, v in ipairs(arglist) do
-    if v == "-f" then
-      nametype = "file"
-    elseif v == "-c" then
+    if v == "-c" then
       nametype = "cmd"
     elseif v == "-e" then
       nametype = "env"
+    elseif v == "-f" then
+      nametype = "file"
+    elseif v == "-p" then
+      nametype = "pkg"
     else
       if nametype then
         insert(namelist, {nametype, v})
