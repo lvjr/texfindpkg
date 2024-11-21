@@ -1,7 +1,7 @@
 #!/usr/bin/env texlua
 
 -- Description: Install TeX packages and their dependencies
--- Copyright: 2023 (c) Jianrui Lyu <tolvjr@163.com>
+-- Copyright: 2023-2024 (c) Jianrui Lyu <tolvjr@163.com>
 -- Repository: https://github.com/lvjr/texfindpkg
 -- License: GNU General Public License v3.0
 
