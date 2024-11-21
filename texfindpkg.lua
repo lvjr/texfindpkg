@@ -552,10 +552,44 @@ local function parseName(name)
   end
 end
 
+local function readArgsInFile(list, inname)
+  local intext = fileRead(inname)
+  if not intext then
+    tfpPrint("error in reading input file " .. inname)
+    return list
+  end
+  tfpPrint("reading input file " .. inname)
+  for line in gmatch(intext, "%s*(.-)%s*\r?\n") do
+    line = match(line, "(.-)%s*#") or line
+    --print("|" .. line .. "|")
+    if line ~= "" then
+      insert(list, line)
+    end
+  end
+  return list
+end
+
+local function readArgList(arglist)
+  local reallist = {}
+  local isinput = false
+  for _, v in ipairs(arglist) do
+    if isinput then
+      reallist = readArgsInFile(reallist, v)
+      isinput = false
+    elseif v == "-i" then
+      isinput = true
+    else
+      insert(reallist, v)
+    end
+  end
+  return reallist
+end
+
 local function parseArgList(arglist)
+  local reallist = readArgList(arglist)
   local namelist = {}
   local nametype = nil
-  for _, v in ipairs(arglist) do
+  for _, v in ipairs(reallist) do
     if v == "-c" then
       nametype = "cmd"
     elseif v == "-e" then
