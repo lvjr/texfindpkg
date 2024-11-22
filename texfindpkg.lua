@@ -301,6 +301,8 @@ local function installSomePackages(list)
     end
     tfpExecute("tlmgr install " .. pkgs)
   else
+    -- miktex fails if one of the packages is already installed
+    -- so we install miktex packages one by one
     for _, p in ipairs(list) do
       tfpRealPrint("installing miktex package: " .. p)
       tfpExecute("miktex packages install " .. p)
