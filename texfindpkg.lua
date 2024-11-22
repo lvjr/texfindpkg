@@ -680,9 +680,12 @@ valid actions are:
    version      Print version information and exit
 
 valid options are:
-   -f           Query or install by file name
    -c           Query or install by command name
    -e           Query or install by environment name
+   -f           Query or install by file name
+   -p           Query or install by package name
+   -i           Read arguments line by line from a file
+   -o           Write total dependent list to a file
 
 please report bug at https://github.com/lvjr/texfindpkg
 ]]

@@ -45,13 +45,46 @@ texfindpkg <action> [<option>] [<name>]
 The `<action>` could be `query`, `install`, `help` or `version`.
 The leading dashes in any `<action>` will be removed first.
 
-For `query` action, you pass `-f`, `-c` or `-e` as `<option>`
-to indicate the following `<name>` is a file name, command name or environment name.
-For example,
-
-- `texfindpkg query -f array.sty` means querying package with file `array.sty`;
+For `query` action, you pass `-c`, `-e`, `-f` or `-p` as `<option>`
+to indicate the following `<name>` is a command name, environment name, file name or package name.
+For example (for `-f` option, you can omit file extension in the name if it is `.sty`),
 - `texfindpkg query -c fakeverb` means querying package with command `\fakeverb`;
-- `texfindpkg query -e frame` means querying package with environment `{frame}`.
+- `texfindpkg query -e frame` means querying package with environment `{frame}`;
+- `texfindpkg query -f array.sty` means querying package with file `array.sty`;
+- `texfindpkg query -p caption` means querying LaTeX packages in TeXLive/MiKTeX package `caption`.
+
+You can query a lot of names in one go. For example,
+```
+texfindpkg query -c fakeverb -e verbatim tblr -f array longtable -p caption
+```
+
+When you have a lot of names to query, you may want to list them in a file and use `-i` option to insert them.
+For example, if you have a file `input.txt` of lines (comments starting with `#` characters are ignored in it)
+```
+-c
+fakeverb
+-e
+verbatim
+tblr
+-f
+array
+longtable
+-p
+caption
+```
+then the following command produces the same result as the previous one does:
+```
+texfindpkg query -i input.txt
+```
+
+Furthermore you can save total dependent list of packages to a file with `-o` option:
+```
+texfindpkg query -i input.txt -o output.txt
+```
+
+With `-i` and `-o` options, it is quite easy to install a minimal TeXLive distribution with all dependencies resolved,
+which is useful for you to run regression tests with GitHub Actions if you are a package writer.
+Please see `latex-package.txt` and `texlive-package.txt` in [tabularray](https://github.com/lvjr/tabularray/tree/main/.github/workflows) repository for a practical example.
 
 The only difference between `query` and `install` actions is that
 with `install` action TeXFindPkg will install missing TeXLive or MiKTeX packages at the end.
