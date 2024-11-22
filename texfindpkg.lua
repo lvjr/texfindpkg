@@ -452,6 +452,10 @@ local function queryByPackageName(pname)
     end
   else
     tfpPrint("could not find any package file in " .. dist .. " package " .. pname)
+    listSomePackages({pname})
+    if not valueExists(totaldeplist, pname) then
+      insert(totaldeplist, pname)
+    end
   end
 end
 
