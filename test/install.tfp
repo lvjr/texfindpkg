@@ -18,21 +18,17 @@ texfindpkg install \fakeverb
 [tfp] building dependency tree for codehigh.sty:
 [tfp] ------------------------
 [tfp] codehigh.sty (from codehigh)
-[tfp] |- expl3.sty (from l3kernel)
 [tfp] |- catchfile.sty (from catchfile)
 [tfp]    |- infwarerr.sty (from infwarerr)
-[tfp]    |- ltxcmds.sty (from ltxcmds)
 [tfp]    |- etexcmds.sty (from etexcmds)
-[tfp] |- xcolor.sty (from xcolor)
-[tfp]    |- color.sty (from graphics)
-[tfp]    |- colortbl.sty (from colortbl)
-[tfp]       |- array.sty (from tools)
-[tfp]    |- pdfcolmk.sty (from pdfcolmk)
 [tfp] |- ninecolors.sty (from ninecolors)
-[tfp] |- varwidth.sty (from varwidth)
+[tfp]    |- xcolor.sty (from xcolor)
+[tfp]       |- color.sty (from graphics)
+[tfp]       |- colortbl.sty (from colortbl)
+[tfp]          |- array.sty (from tools)
 [tfp] |- iftex.sty (from iftex)
 [tfp] ------------------------
-[tfp] texlive packages needed: codehigh l3kernel catchfile infwarerr ltxcmds etexcmds xcolor graphics colortbl tools pdfcolmk ninecolors varwidth iftex
+[tfp] texlive packages needed: catchfile codehigh colortbl etexcmds graphics iftex infwarerr ninecolors tools xcolor
 >>>>>>>>
 <<<<<<<<
 texfindpkg install {frame}
@@ -50,6 +46,8 @@ texfindpkg install {frame}
 texfindpkg install foobar
 --------
 [tfp] you are using texlive
+[tfp] ================================================
+[tfp] texlive package foobar doesn't exist
 >>>>>>>>
 <<<<<<<<
 texfindpkg install foobar.sty
