@@ -514,6 +514,8 @@ local function queryOne(t, name)
   end
 end
 
+local outfile = nil
+
 local function query(namelist)
   for _, v in ipairs(namelist) do
     queryOne(v[1], v[2])
@@ -538,6 +540,11 @@ local function query(namelist)
       tfpRealPrint(dist .. " package not yet installed in total: " .. pkgs)
     else
       tfpRealPrint(dist .. " packages not yet installed in total: " .. pkgs)
+    end
+    if outfile then
+      --print(outfile)
+      pkgs = concat(totaldeplist, "\n")
+      fileWrite(pkgs, outfile)
     end
   end
 end
@@ -592,12 +599,18 @@ end
 local function readArgList(arglist)
   local reallist = {}
   local isinput = false
+  local isoutput = false
   for _, v in ipairs(arglist) do
     if isinput then
       reallist = readArgsInFile(reallist, v)
       isinput = false
+    elseif isoutput then
+      outfile = v
+      isoutput = false
     elseif v == "-i" then
       isinput = true
+    elseif v == "-o" then
+      isoutput = true
     else
       insert(reallist, v)
     end
