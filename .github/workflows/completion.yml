@@ -19,7 +19,7 @@ jobs:
         repository: texstudio-org/texstudio
         path: texstudio
     - name: Upload cwl files
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: texstudio-completion
         path: |
